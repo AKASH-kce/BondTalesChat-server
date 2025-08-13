@@ -1,8 +1,11 @@
 ﻿using System.Text.Json;
+using BCrypt.Net;
+using BondTalesChat_Server.Models;
+using BondTalesChat_Server.Models.Dto;
+using BondTalesChat_Server.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using BCrypt.Net;
 
 namespace BondTalesChat_Server.Controllers
 {
@@ -10,59 +13,39 @@ namespace BondTalesChat_Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
+        private readonly UserRepository _userRepository;
 
         public UserController(IConfiguration configuration)
         {
-            _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _userRepository = new UserRepository(configuration);
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] JsonElement  body)
+        public IActionResult Register([FromBody] registrationDto  userDetails)
         {
-            if (!body.TryGetProperty("username", out var uProp) ||
-                !body.TryGetProperty("email", out var eProp) ||
-                !body.TryGetProperty("password", out var pProp))
-                return BadRequest(new { error = "username and password are required" });
 
-            var username = uProp.GetString();
-            var email = eProp.GetString();
-            var password = pProp.GetString();
-
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) ||  string.IsNullOrWhiteSpace(password))
-                return BadRequest(new { error = "username and password cannot be empty" });
-
-            // Check if user exists
-            using (var conn = new SqlConnection(_connectionString))
+            if (string.IsNullOrWhiteSpace(userDetails.Username) || string.IsNullOrWhiteSpace(userDetails.Email) || string.IsNullOrWhiteSpace(userDetails.Password))
             {
-                conn.Open();
-
-                using (var checkCmd = new SqlCommand(
-                    "SELECT 1 FROM Users WHERE Email = @e", conn))
-                {
-                   // checkCmd.Parameters.AddWithValue("@u", username!);
-                    checkCmd.Parameters.AddWithValue("@e", email!);
-                    var exists = checkCmd.ExecuteScalar();
-                    if (exists != null)
-                        return BadRequest(new { error = "User already exists" });
-                }
-
-                // Hash password
-                var hash = BCrypt.Net.BCrypt.HashPassword(password);
-
-                using (var insertCmd = new SqlCommand(
-                    "INSERT INTO Users (Username, Email, PasswordHash) VALUES (@u, @e, @h)", conn))
-                {
-                    insertCmd.Parameters.AddWithValue("@u", username!);
-                    insertCmd.Parameters.AddWithValue("@h", hash);
-                    insertCmd.Parameters.AddWithValue("@e", email!);
-                    insertCmd.ExecuteNonQuery();
-                }
+                return BadRequest(new { success = false, message = "username, email, and password cannot be empty" });
             }
 
-            return Ok(new { message = "User registered successfully" });
+            if (_userRepository.UserExists(userDetails.Email))
+            {
+                return BadRequest(new { success = false, message = "User already exists" });
+            }
+
+            var hash = BCrypt.Net.BCrypt.HashPassword(userDetails.Password);
+
+            var user = new UserModel
+            {
+                username = userDetails.Username!,
+                email = userDetails.Email!,
+                password = hash
+            };
+
+            _userRepository.CreateUser(user);
+
+            return Ok(new { success = true, message = "User registered successfully" });
         }
     }
 }

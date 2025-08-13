@@ -12,7 +12,7 @@
         ],
         "parameters": [
           {
-            "name": "senderId",
+            "name": "MessageId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -20,7 +20,7 @@
             }
           },
           {
-            "name": "receiverId",
+            "name": "SenderId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -28,10 +28,34 @@
             }
           },
           {
-            "name": "message",
+            "name": "GroupId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "ReceiverId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "MessageText",
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "SentAt",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -50,13 +74,19 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { }
+              "schema": {
+                "$ref": "#/components/schemas/registrationDto"
+              }
             },
             "text/json": {
-              "schema": { }
+              "schema": {
+                "$ref": "#/components/schemas/registrationDto"
+              }
             },
             "application/*+json": {
-              "schema": { }
+              "schema": {
+                "$ref": "#/components/schemas/registrationDto"
+              }
             }
           }
         },
@@ -126,6 +156,24 @@
             "readOnly": true
           },
           "summary": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "registrationDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
             "type": "string",
             "nullable": true
           }

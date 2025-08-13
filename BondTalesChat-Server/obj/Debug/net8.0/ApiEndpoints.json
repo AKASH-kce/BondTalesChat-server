@@ -8,18 +8,33 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "senderId",
+        "Name": "MessageId",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "receiverId",
+        "Name": "SenderId",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "message",
+        "Name": "GroupId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "ReceiverId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "MessageText",
         "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SentAt",
+        "Type": "System.DateTime",
         "IsRequired": false
       }
     ],
@@ -34,8 +49,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "body",
-        "Type": "System.Text.Json.JsonElement",
+        "Name": "userDetails",
+        "Type": "BondTalesChat_Server.Models.Dto.registrationDto",
         "IsRequired": true
       }
     ],

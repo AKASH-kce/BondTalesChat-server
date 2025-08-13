@@ -1,8 +1,10 @@
-﻿namespace BondTalesChat_Server.Models
+﻿using BondTalesChat_Server.Interfaces;
+
+namespace BondTalesChat_Server.Models
 {
-    public class UserModel
+    public class UserModel: IUser
     {
-        public int Id { get; set; }
+        public int userId { get; set; }
         public string username { get; set; }
         public string email { get; set; }
         public string password { get; set; }
