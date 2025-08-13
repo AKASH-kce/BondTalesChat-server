@@ -1,4 +1,5 @@
 ﻿using BondTalesChat_Server.Data;
+using BondTalesChat_Server.models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BondTalesChat_Server.Hubs
@@ -12,22 +13,24 @@ namespace BondTalesChat_Server.Hubs
             _context = context;
         }
 
-        public async Task SendMessage(int senderId, int receiverId,string message)
+        public async Task SendMessage(int messageId, int senderId, int groupId, int receiverId, string messageText, DateTime sentAt)
         {
             var msg = new Message
             {
+                MessageId = messageId,
                 SenderId = senderId,
+                GroupId = groupId,
                 ReceiverId = receiverId,
-                Content = message,
-                SentAt = DateTime.Now
+                MessageText = messageText,
+                SentAt = sentAt
             };
 
             _context.Messages.Add(msg);
             await _context.SaveChangesAsync();
 
-            await Clients.All.SendAsync("Receive message", senderId, receiverId, message, msg.SentAt);
-
-
+            await Clients.All.SendAsync("ReceiveMessage", senderId, receiverId, messageText, sentAt);
         }
+
+
     }
 }
