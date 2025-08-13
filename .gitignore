@@ -19,20 +19,32 @@ Release/
 *.dbmdl
 *.bak
 
-# Visual Studio config and temp
+# NuGet
+*.nupkg
 *.nuget.dgspec.json
 *.nuget.g.props
 *.nuget.g.targets
+project.assets.json
+project.nuget.cache
+packages/
+
+# Generated files
 *.g.cs
 *.g.i.cs
 *.tmp
-*.ide
 
 # Rider / JetBrains
 .idea/
 *.iml
 
-# Other
+# Other caches / temp
+*.ide
 *.dswa.cache.json
-project.assets.json
-project.nuget.cache
+
+# Publish output
+publish/
+*.zip
+
+# Frontend / Node (if applicable)
+node_modules/
+wwwroot/lib/
