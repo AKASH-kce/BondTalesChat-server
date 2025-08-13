@@ -1,2 +1,38 @@
-BondTalesChat-Server/.vs/BondTalesChat-Server/FileContentIndex/0101d6c8-1d44-4832-a173-1b7bf2a8fd7f.vsidx
-/BondTalesChat-Server/.vs
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+Debug/
+Release/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.vsidx
+*.dbmdl
+*.bak
+
+# Visual Studio config and temp
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+*.g.cs
+*.g.i.cs
+*.tmp
+*.ide
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Other
+*.dswa.cache.json
+project.assets.json
+project.nuget.cache
