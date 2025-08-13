@@ -1,5 +1,6 @@
 ﻿using BondTalesChat_Server.Data;
 using BondTalesChat_Server.Hubs;
+using BondTalesChat_Server.models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Text.RegularExpressions;
