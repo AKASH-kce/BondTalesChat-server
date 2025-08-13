@@ -6182,11 +6182,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\akash.settukannu\\Documents\\GitHub\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
+      "projectUniqueName": "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
       "projectName": "BondTalesChat-Server",
-      "projectPath": "C:\\Users\\akash.settukannu\\Documents\\GitHub\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
+      "projectPath": "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
       "packagesPath": "C:\\Users\\akash.settukannu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\akash.settukannu\\Documents\\GitHub\\BondTalesChat-server\\BondTalesChat-Server\\obj\\",
+      "outputPath": "D:\\BondTalesChat-server\\BondTalesChat-Server\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
