@@ -1,4 +1,5 @@
 using BondTalesChat_Server.Data;
+using BondTalesChat_Server.DatabaseInitializer;
 using BondTalesChat_Server.Hubs;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+//Configure the SQL scripts folder path
+var projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
+var sqlFolderPath = Path.Combine(projectRoot, "BondTalesChat-Database", "create-tables-sql");
+
+Console.WriteLine(sqlFolderPath);
+
+//run a method to execute the SQL files and create table during initialization
+DatabaseInitializer.Initializer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlFolderPath);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

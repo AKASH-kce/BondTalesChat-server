@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace BondTalesChat_Server.Data
 {
@@ -6,8 +7,9 @@ namespace BondTalesChat_Server.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
-        {
-        }
+        { }
+            public DbSet<Message> Messages { get; set; }
+        
 
         // Add DbSets here if using EF Core for tables, otherwise omit
         // Example:
