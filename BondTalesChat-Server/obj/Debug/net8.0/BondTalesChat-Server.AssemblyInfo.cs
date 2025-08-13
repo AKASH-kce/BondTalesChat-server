@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BondTalesChat-Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74b03e0959dc20429b9d3ce9e55f85174ce56377")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd0b4332282a935cb92f73adeb2275dc687566f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("BondTalesChat-Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BondTalesChat-Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

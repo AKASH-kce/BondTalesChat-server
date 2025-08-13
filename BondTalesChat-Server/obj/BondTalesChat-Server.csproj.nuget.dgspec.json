@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\koushiik r m\\Desktop\\Chat Application\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj": {}
+    "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\koushiik r m\\Desktop\\Chat Application\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj": {
+    "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\koushiik r m\\Desktop\\Chat Application\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
+        "projectUniqueName": "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
         "projectName": "BondTalesChat-Server",
-        "projectPath": "C:\\Users\\koushiik r m\\Desktop\\Chat Application\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
-        "packagesPath": "C:\\Users\\koushiik r m\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\koushiik r m\\Desktop\\Chat Application\\BondTalesChat-server\\BondTalesChat-Server\\obj\\",
+        "projectPath": "D:\\BondTalesChat-server\\BondTalesChat-Server\\BondTalesChat-Server.csproj",
+        "packagesPath": "C:\\Users\\akash.settukannu\\.nuget\\packages\\",
+        "outputPath": "D:\\BondTalesChat-server\\BondTalesChat-Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\koushiik r m\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\akash.settukannu\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +26,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {},
+          "https://geniedevops.unysite.com/Genie/_packaging/GeniePackages/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {

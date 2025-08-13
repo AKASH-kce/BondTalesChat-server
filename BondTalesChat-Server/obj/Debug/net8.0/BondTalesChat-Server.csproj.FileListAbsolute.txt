@@ -354,3 +354,5 @@ C:\Users\koushiik r m\Desktop\Chat Application\BondTalesChat-server\BondTalesCha
 C:\Users\koushiik r m\Desktop\Chat Application\BondTalesChat-server\BondTalesChat-Server\obj\Debug\net8.0\ref\BondTalesChat-Server.dll
 C:\Users\koushiik r m\Desktop\Chat Application\BondTalesChat-server\BondTalesChat-Server\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\koushiik r m\Desktop\Chat Application\BondTalesChat-server\BondTalesChat-Server\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\BondTalesChat-server\BondTalesChat-Server\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\BondTalesChat-server\BondTalesChat-Server\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
