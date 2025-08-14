@@ -48,5 +48,31 @@ namespace BondTalesChat_Server.Repositories
                 }
             }
         }
+
+        public UserModel? GetUserByEmail(string email)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand("SELECT UserId, Username, Email, PasswordHash FROM Users Where Email = @e", conn))
+                {
+                    cmd.Parameters.AddWithValue("@e", email);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new UserModel
+                            {
+                                userId = reader.GetInt32(0),
+                                username = reader.GetString(1),
+                                email = reader.GetString(2),
+                                password = reader.GetString(3)
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
     }
 }
