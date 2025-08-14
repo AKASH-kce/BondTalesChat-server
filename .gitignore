@@ -1,0 +1,50 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/
+obj/
+Debug/
+Release/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.vsidx
+*.dbmdl
+*.bak
+
+# NuGet
+*.nupkg
+*.nuget.dgspec.json
+*.nuget.g.props
+*.nuget.g.targets
+project.assets.json
+project.nuget.cache
+packages/
+
+# Generated files
+*.g.cs
+*.g.i.cs
+*.tmp
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Other caches / temp
+*.ide
+*.dswa.cache.json
+
+# Publish output
+publish/
+*.zip
+
+# Frontend / Node (if applicable)
+node_modules/
+wwwroot/lib/
