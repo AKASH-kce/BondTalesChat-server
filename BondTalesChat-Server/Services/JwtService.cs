@@ -22,7 +22,7 @@ namespace BondTalesChat_Server.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.userId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.username),
                 new Claim(ClaimTypes.Email, user.email)
             };
