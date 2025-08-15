@@ -1,9 +1,6 @@
-﻿using BondTalesChat_Server.Data;
-using BondTalesChat_Server.Hubs;
-using BondTalesChat_Server.models;
+﻿using BondTalesChat_Server.models;
+using BondTalesChat_Server.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using System.Text.RegularExpressions;
 
 namespace BondTalesChat_Server.Controllers
 {
@@ -11,35 +8,17 @@ namespace BondTalesChat_Server.Controllers
     [Route("api/[controller]")]
     public class MessageTestController : ControllerBase
     {
-        private readonly IHubContext<ChatHub> _hubContext;
-        private readonly AppDbContext _context;
+        private readonly IMessageService _messageService;
 
-        public MessageTestController(IHubContext<ChatHub> hubContext, AppDbContext context)
+        public MessageTestController(IMessageService messageService)
         {
-            _hubContext = hubContext;
-            _context = context;
+            _messageService = messageService;
         }
 
-        // POST: api/MessageTest/send
         [HttpPost("send")]
-        public async Task<IActionResult> SendMessage(int MessageId, int SenderId, int GroupId,int ReceiverId,string MessageText,DateTime SentAt)
+        public async Task<IActionResult> SendMessage(int senderId, int groupId, int receiverId, string messageText)
         {
-            // Save message to DB
-            var msg = new Message
-            {
-                MessageId = MessageId,
-                SenderId = SenderId,
-                GroupId = GroupId,
-                ReceiverId = ReceiverId,
-                MessageText = MessageText,
-                SentAt = SentAt
-            };
-            _context.Messages.Add(msg);
-            await _context.SaveChangesAsync();
-
-            // Send message via SignalR
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", msg.MessageId, msg.SenderId, msg.GroupId, msg.ReceiverId,msg.MessageText,msg.SentAt);
-
+            var msg = await _messageService.SaveAndBroadcastAsync(senderId, groupId, receiverId, messageText);
             return Ok(new { Status = "Message sent", Message = msg });
         }
     }
