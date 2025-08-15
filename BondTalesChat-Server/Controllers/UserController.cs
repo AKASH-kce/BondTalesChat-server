@@ -94,7 +94,7 @@ namespace BondTalesChat_Server.Controllers
                 token,
                 user = new
                 {
-                    user.userId,
+                    user.UserId,
                     user.username,
                     user.email
                 }
