@@ -76,12 +76,13 @@ namespace BondTalesChat_Server.Controllers
             }
 
             var token = _jwtService.GenerateToken(user);
+            // var token = GenerateJwtToken(user);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = false, // ← SET THIS TO FALSE FOR LOCALHOST
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]))
             });
 
@@ -130,6 +131,7 @@ namespace BondTalesChat_Server.Controllers
             return Ok(new
             {
                 success = true,
+                message = "verfied",
                 user = new
                 {
                     id = int.Parse(userId),
