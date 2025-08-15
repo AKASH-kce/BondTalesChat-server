@@ -7,35 +7,37 @@ namespace BondTalesChat_Server.Services
 {
     public interface IMessageService
     {
-        Task<Message> SaveAndBroadcastAsync(int senderId, int? groupId, int? receiverId, string messageText);
+        Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, Byte MessageType, Boolean Edited, Boolean Deleted);
     }
 
     public class MessageService : IMessageService
     {
-        private readonly AppDbContext _context;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly AppDbContext _db;
+        private readonly IHubContext<ChatHub> _hub;
 
         public MessageService(AppDbContext context, IHubContext<ChatHub> hubContext)
         {
-            _context = context;
-            _hubContext = hubContext;
+            _db = context;
+            _hub = hubContext;
         }
 
-        public async Task<Message> SaveAndBroadcastAsync(int senderId, int? groupId, int? receiverId, string messageText)
+        public async Task<MessageModel> SaveAndBroadcastAsync(int ConversationId,int senderId, string Messagetext,string MediaUrl,Byte MessageType,Boolean Edited,Boolean Deleted)
         {
-            var msg = new Message
+            var msg = new MessageModel
             {
+                ConversationId = ConversationId,
                 SenderId = senderId,
-                GroupId = groupId == 0 ? null : groupId,
-                ReceiverId = receiverId == 0 ? null : receiverId,
-                MessageText = messageText,
-                SentAt = DateTime.Now
+                MessageText = Messagetext,
+                MediaUrl = MediaUrl,
+                MessageType=MessageType,
+                Edited=Edited,
+                Deleted=Deleted    
             };
 
-            _context.Messages.Add(msg);
-            await _context.SaveChangesAsync();
+            _db.Messages.Add(msg);
+            await _db.SaveChangesAsync();
 
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", msg);
+            await _hub.Clients.All.SendAsync("ReceiveMessage", msg);
             return msg;
         }
     }

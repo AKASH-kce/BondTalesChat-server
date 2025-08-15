@@ -63,7 +63,7 @@ namespace BondTalesChat_Server.Repositories
                         {
                             return new UserModel
                             {
-                                userId = reader.GetInt32(0),
+                                UserId = reader.GetInt32(0),
                                 username = reader.GetString(1),
                                 email = reader.GetString(2),
                                 password = reader.GetString(3)

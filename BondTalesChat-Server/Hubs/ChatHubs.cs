@@ -13,9 +13,9 @@ namespace BondTalesChat_Server.Hubs
             _messageService = messageService;
         }
 
-        public async Task<Message> SendMessage(int senderId, int groupId, int receiverId, string messageText)
+        public async Task<MessageModel> SendMessage(int ConversationId, int senderId, string Messagetext, string MediaUrl, Byte MessageType, Boolean Edited, Boolean Deleted)
         {
-            return await _messageService.SaveAndBroadcastAsync(senderId, groupId, receiverId, messageText);
+            return await _messageService.SaveAndBroadcastAsync(ConversationId,  senderId,  Messagetext,  MediaUrl, MessageType,  Edited,  Deleted);
         }
     }
 }
