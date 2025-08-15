@@ -100,6 +100,22 @@ namespace BondTalesChat_Server.Controllers
             });
         }
 
+        //Logout
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Append("token", "", new CookieOptions
+            { HttpOnly = true,
+              Secure = true,
+              SameSite = SameSiteMode.None,
+              Expires = DateTime.UtcNow.AddYears(-1) // Expire immediately
+            });
+
+            return Ok(new { success = true, message = "Logged out successfully."});
+
+        }
+
         //cookie related change.
 
         [HttpGet("verify-auth")]
