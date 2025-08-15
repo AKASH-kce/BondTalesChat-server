@@ -2,9 +2,10 @@
 {
     public interface IUser
     {
-        int userId { get; set; }
+        int UserId { get; set; }
         string username { get; set; }
         string email { get; set; }
         string password { get; set; }
+        string ProfilePicture { get; set; }
     }
 }

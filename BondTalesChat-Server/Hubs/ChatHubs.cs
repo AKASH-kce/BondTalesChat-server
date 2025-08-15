@@ -1,36 +1,21 @@
-﻿using BondTalesChat_Server.Data;
-using BondTalesChat_Server.models;
+﻿using BondTalesChat_Server.models;
+using BondTalesChat_Server.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BondTalesChat_Server.Hubs
 {
     public class ChatHub : Hub
     {
-        private readonly AppDbContext _context;
+        private readonly IMessageService _messageService;
 
-        public ChatHub(AppDbContext context)
+        public ChatHub(IMessageService messageService)
         {
-            _context = context;
+            _messageService = messageService;
         }
 
-        public async Task SendMessage(int messageId, int senderId, int groupId, int receiverId, string messageText, DateTime sentAt)
+        public async Task<Message> SendMessage(int senderId, int groupId, int receiverId, string messageText)
         {
-            var msg = new Message
-            {
-                MessageId = messageId,
-                SenderId = senderId,
-                GroupId = groupId,
-                ReceiverId = receiverId,
-                MessageText = messageText,
-                SentAt = sentAt
-            };
-
-            _context.Messages.Add(msg);
-            await _context.SaveChangesAsync();
-
-            await Clients.All.SendAsync("ReceiveMessage", senderId, receiverId, messageText, sentAt);
+            return await _messageService.SaveAndBroadcastAsync(senderId, groupId, receiverId, messageText);
         }
-
-
     }
 }
