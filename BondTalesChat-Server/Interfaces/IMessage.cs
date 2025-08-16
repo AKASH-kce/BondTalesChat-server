@@ -8,7 +8,7 @@
         string MessageText { get; set; }
         string? MediaUrl { get; set; }
         byte MessageType { get; set; }
-        DateTime? SentAt { get; set; }
+        DateTime SentAt { get; set; }
         bool Edited { get; set; }
         bool Deleted { get; set; }
     }
