@@ -19,7 +19,7 @@ namespace BondTalesChat_Server.models
         public string MessageText { get; set; }
         public string? MediaUrl { get; set; }
         public byte MessageType { get; set; } = 0;
-        public DateTime? SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; } = DateTime.UtcNow;
         public bool Edited { get; set; } = false;
         public bool Deleted { get; set; } = false;
 

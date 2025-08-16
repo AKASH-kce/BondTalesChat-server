@@ -34,7 +34,8 @@ namespace BondTalesChat_Server.Services
                 MediaUrl = MediaUrl,
                 MessageType = MessageType,
                 Edited = Edited,
-                Deleted = Deleted
+                Deleted = Deleted,
+                SentAt= DateTime.UtcNow
             };
 
             _db.Messages.Add(msg);
