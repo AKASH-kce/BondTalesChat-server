@@ -2,12 +2,14 @@
 using BondTalesChat_Server.Hubs;
 using BondTalesChat_Server.models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BondTalesChat_Server.Services
 {
     public interface IMessageService
     {
         Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted);
+         Task<MessageModel[]> GetMessagesOfCurrentLoginUser(int loginuserId);
     }
 
     public class MessageService : IMessageService
@@ -22,6 +24,7 @@ namespace BondTalesChat_Server.Services
         }
 
         public async Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted)
+
         {
             var msg = new MessageModel
             {
@@ -39,6 +42,13 @@ namespace BondTalesChat_Server.Services
 
             await _hub.Clients.All.SendAsync("ReceiveMessage", msg);
             return msg;
+        }
+
+        public async Task<MessageModel[]> GetMessagesOfCurrentLoginUser(int loginuserId)
+        {
+            return await _db.Messages.Where(m => m.SenderId == loginuserId).
+                OrderBy(m => m.SentAt)
+                .ToArrayAsync();
         }
     }
 }

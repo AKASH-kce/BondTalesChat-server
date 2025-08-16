@@ -17,5 +17,14 @@ namespace BondTalesChat_Server.Hubs
         {
             return await _messageService.SaveAndBroadcastAsync(ConversationId, senderId, Messagetext, MediaUrl, MessageType, Edited, Deleted);
         }
+
+        public async Task<MessageModel[]> GetLoginUserAllMessagesByID(int loginUserId)
+        {
+            var messages = await _messageService.GetMessagesOfCurrentLoginUser(loginUserId);
+            return messages;
+
+            // OR to send directly to caller:
+            // await Clients.Caller.SendAsync("ReceiveAllMessages", messages);
+        }
     }
 }
