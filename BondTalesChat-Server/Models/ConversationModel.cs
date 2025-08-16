@@ -11,7 +11,7 @@ namespace BondTalesChat_Server.Models
         public int? CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<ConversationMemberModel> Members { get; set; }
-        public ICollection<MessageModel> Messages { get; set; }
+        //public ICollection<ConversationMemberModel> Members { get; set; }
+        //public ICollection<MessageModel> Messages { get; set; }
     }
 }

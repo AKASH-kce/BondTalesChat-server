@@ -1,5 +1,6 @@
 ﻿using BondTalesChat_Server.models;
 using BondTalesChat_Server.Services;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BondTalesChat_Server.Controllers
@@ -16,9 +17,9 @@ namespace BondTalesChat_Server.Controllers
         }
 
         [HttpPost("send")]
-        public async Task<IActionResult> SendMessage(int senderId, int groupId, int receiverId, string messageText)
+        public async Task<IActionResult> SendMessage(int ConversationId, int senderId, string Messagetext, string MediaUrl, Byte MessageType, Boolean Edited, Boolean Deleted)
         {
-            var msg = await _messageService.SaveAndBroadcastAsync(senderId, groupId, receiverId, messageText);
+            var msg = await _messageService.SaveAndBroadcastAsync(ConversationId, senderId,  Messagetext,  MediaUrl,  MessageType,  Edited,  Deleted);
             return Ok(new { Status = "Message sent", Message = msg });
         }
     }
