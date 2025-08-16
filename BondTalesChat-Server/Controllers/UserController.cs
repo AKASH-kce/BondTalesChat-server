@@ -51,7 +51,39 @@ namespace BondTalesChat_Server.Controllers
 
             _userRepository.CreateUser(user);
 
-            return Ok(new { success = true, message = "User registered successfully" });
+            var userData = _userRepository.GetUserByEmail(userDetails.Email);
+
+            Console.WriteLine($"{userData.UserId}, {userData.username}, {userData.email}");
+
+            if (userData == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { success = false, message = "User data could not be retrieved after registration." });
+            }
+
+            var token = _jwtService.GenerateToken(user);
+
+            Response.Cookies.Append("token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // ← SET THIS TO FALSE FOR LOCALHOST
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]))
+            });
+
+            return Ok(new
+            {
+                success = true,
+                message = "User registered successfully",
+                token,
+                user = new
+                {
+                    userData.UserId,
+                    userData.username,
+                    userData.email
+                }
+            });
+
+            // return Ok(new { success = true, message = "User registered successfully" });
         }
 
         [HttpPost("login")]

@@ -24,9 +24,9 @@ namespace BondTalesChat_Server.Repositories
             {
                 conn.Open();
                 using (var checkCmd = new SqlCommand(
-                    "SELECT 1 FROM Users WHERE Email = @e", conn))
+                    "SELECT 1 FROM Users WHERE email = @e", conn))
                 {
-                    checkCmd.Parameters.AddWithValue("@e", email);
+                    checkCmd.Parameters.AddWithValue("@e", email.Trim());
                     var exists = checkCmd.ExecuteScalar();
                     return exists != null;
                 }
@@ -39,7 +39,7 @@ namespace BondTalesChat_Server.Repositories
             {
                 conn.Open();
                 using (var insertCmd = new SqlCommand(
-                    "INSERT INTO Users (Username, Email, PasswordHash) VALUES (@u, @e, @h)", conn))
+                    "INSERT INTO Users (username, email, userpassword) VALUES (@u, @e, @h)", conn))
                 {
                     insertCmd.Parameters.AddWithValue("@u", user.username);
                     insertCmd.Parameters.AddWithValue("@e", user.email);
@@ -54,7 +54,7 @@ namespace BondTalesChat_Server.Repositories
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (var cmd = new SqlCommand("SELECT UserId, Username, Email, PasswordHash FROM Users Where Email = @e", conn))
+                using (var cmd = new SqlCommand("SELECT UserId, username, email, userpassword FROM Users Where email = @e", conn))
                 {
                     cmd.Parameters.AddWithValue("@e", email);
                     using (var reader = cmd.ExecuteReader())
