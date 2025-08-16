@@ -1,4 +1,5 @@
-﻿using BondTalesChat_Server.Models;
+﻿using System.Data;
+using BondTalesChat_Server.Models;
 using Microsoft.Data.SqlClient;
 
 namespace BondTalesChat_Server.Repositories
@@ -20,18 +21,22 @@ namespace BondTalesChat_Server.Repositories
 
         public bool UserExists(string email)
         {
+            //Console.WriteLine($"the mail that came here {email}.");
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
                 using (var checkCmd = new SqlCommand(
                     "SELECT 1 FROM Users WHERE email = @e", conn))
                 {
-                    checkCmd.Parameters.AddWithValue("@e", email.Trim());
+                    checkCmd.Parameters.AddWithValue("@e", email);
                     var exists = checkCmd.ExecuteScalar();
                     return exists != null;
                 }
+                
             }
         }
+
+
 
         public void CreateUser(UserModel user)
         {
@@ -51,12 +56,18 @@ namespace BondTalesChat_Server.Repositories
 
         public UserModel? GetUserByEmail(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            Console.WriteLine($"Deii pota email {email}");
+
+            var trimmedEmail = email.Trim();
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (var cmd = new SqlCommand("SELECT UserId, username, email, userpassword FROM Users Where email = @e", conn))
+                using (var cmd = new SqlCommand("SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt FROM Users Where email = @e", conn))
                 {
-                    cmd.Parameters.AddWithValue("@e", email);
+                    cmd.Parameters.AddWithValue("@e", email.ToString());
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -66,7 +77,9 @@ namespace BondTalesChat_Server.Repositories
                                 UserId = reader.GetInt32(0),
                                 username = reader.GetString(1),
                                 email = reader.GetString(2),
-                                password = reader.GetString(3)
+                                password = reader.GetString(3),
+                                ProfilePicture = "No picture.",
+                                CreatedAt = reader.GetDateTime(5)
                             };
                         }
                     }

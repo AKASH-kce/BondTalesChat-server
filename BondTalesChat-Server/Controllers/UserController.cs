@@ -82,8 +82,6 @@ namespace BondTalesChat_Server.Controllers
                     userData.email
                 }
             });
-
-            // return Ok(new { success = true, message = "User registered successfully" });
         }
 
         [HttpPost("login")]
@@ -95,10 +93,12 @@ namespace BondTalesChat_Server.Controllers
                 return BadRequest(new {success = false, message = "Email and password cannot be empty."});
             }
 
+           
             var user = _userRepository.GetUserByEmail(loginDto.Email);
 
             if (user == null)
             {
+                
                 return BadRequest(new { success = false, message = "Create an account to Login." });
             }
 
