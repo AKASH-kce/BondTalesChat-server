@@ -7,7 +7,7 @@ namespace BondTalesChat_Server.Services
 {
     public interface IMessageService
     {
-        Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, Byte MessageType, Boolean Edited, Boolean Deleted);
+        Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted);
     }
 
     public class MessageService : IMessageService
@@ -21,7 +21,7 @@ namespace BondTalesChat_Server.Services
             _hub = hubContext;
         }
 
-        public async Task<MessageModel> SaveAndBroadcastAsync(int ConversationId,int senderId, string Messagetext,string MediaUrl,Byte MessageType,Boolean Edited,Boolean Deleted)
+        public async Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted)
         {
             var msg = new MessageModel
             {
@@ -29,13 +29,13 @@ namespace BondTalesChat_Server.Services
                 SenderId = senderId,
                 MessageText = Messagetext,
                 MediaUrl = MediaUrl,
-                MessageType=MessageType,
-                Edited=Edited,
-                Deleted=Deleted    
+                MessageType = MessageType,
+                Edited = Edited,
+                Deleted = Deleted
             };
 
             _db.Messages.Add(msg);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(); // EF automatically sets MessageId after this
 
             await _hub.Clients.All.SendAsync("ReceiveMessage", msg);
             return msg;

@@ -1,11 +1,14 @@
 ﻿using BondTalesChat_Server.Interfaces;
 using BondTalesChat_Server.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace BondTalesChat_Server.models
 {
 
     public class MessageModel : IMessage
     {
+        [Key]  // Primary key
+        public int? MessageId { get; set; }
         //public int? MessageId { get; set; }
         public int ConversationId { get; set; }
         //public ConversationModel Conversation { get; set; }

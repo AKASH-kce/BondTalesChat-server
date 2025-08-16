@@ -2,7 +2,7 @@
 {
     public interface IMessage
     {
-        //int ?MessageId { get; set; }
+        int? MessageId { get; set; }
         int ConversationId { get; set; }
         int SenderId { get; set; }
         string MessageText { get; set; }

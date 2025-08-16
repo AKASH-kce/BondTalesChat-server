@@ -14,8 +14,8 @@ namespace BondTalesChat_Server.Models
         public string ProfilePicture { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<ConversationMemberModel> ConversationMembers { get; set; }
-        public ICollection<MessageModel> MessagesSent { get; set; }
-        public ICollection<UserConnectionModel> Connections { get; set; }
+        //public ICollection<ConversationMemberModel> ConversationMembers { get; set; }
+        //public ICollection<MessageModel> MessagesSent { get; set; }
+        //public ICollection<UserConnectionModel> Connections { get; set; }
     }
 }
