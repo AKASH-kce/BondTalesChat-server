@@ -28,7 +28,9 @@ namespace BondTalesChat_Server.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.username),
-                new Claim(ClaimTypes.Email, user.email)
+                new Claim(ClaimTypes.Email, user.email),
+                new Claim(ClaimTypes.MobilePhone, user.phoneNumber),
+                new Claim("ProfilePicture", user.ProfilePicture ?? "")
             };
 
             var token = new JwtSecurityToken

@@ -79,7 +79,8 @@ namespace BondTalesChat_Server.Controllers
                     userData.UserId,
                     userData.username,
                     userData.email,
-                    userData.phoneNumber
+                    userData.phoneNumber,
+                    userData.ProfilePicture
                 }
             });
         }
@@ -129,7 +130,8 @@ namespace BondTalesChat_Server.Controllers
                     user.UserId,
                     user.username,
                     user.email,
-                    user.phoneNumber
+                    user.phoneNumber,
+                    user.ProfilePicture
                 }
             });
         }
@@ -160,18 +162,183 @@ namespace BondTalesChat_Server.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var username = User.FindFirst(ClaimTypes.Name)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
-
+            var phoneNumber = User.FindFirst(ClaimTypes.MobilePhone)?.Value;
+            var profilePicture = User.FindFirst("ProfilePicture")?.Value;
+            Console.WriteLine(profilePicture);
             return Ok(new
             {
                 success = true,
-                message = "verfied",
+                message = "verified",
                 user = new
                 {
                     id = int.Parse(userId),
                     username,
-                    email
+                    email,
+                    phoneNumber,
+                    profilePicture
                 }
             });
         }
+
+
+        // UserController.cs
+
+        [HttpPut("update")]
+        [Authorize]
+        public IActionResult UpdateProfile([FromBody] UpdateProfileDto updateDto)
+        {
+            // Extract user ID from JWT token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { success = false, message = "Invalid authentication token." });
+            }
+
+            // Fetch current user from DB
+            var user = _userRepository.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "User not found." });
+            }
+
+            // Verify current password
+            if (!BCrypt.Net.BCrypt.Verify(updateDto.CurrentPassword, user.password))
+            {
+                return BadRequest(new { success = false, message = "Current password is incorrect." });
+            }
+
+            // Hash new password if provided
+            string hashedPassword = user.password;
+            if (!string.IsNullOrWhiteSpace(updateDto.NewPassword))
+            {
+                hashedPassword = BCrypt.Net.BCrypt.HashPassword(updateDto.NewPassword);
+            }
+
+            // Update user in database
+            bool updated = _userRepository.UpdateUser(
+                userId: userId,
+                username: updateDto.Username!,
+                email: updateDto.Email!,
+                phoneNumber: updateDto.PhoneNumber,
+                passwordHash: hashedPassword
+            );
+
+            if (!updated)
+            {
+                return StatusCode(500, new { success = false, message = "Failed to update user. Please try again." });
+            }
+
+            // Fetch updated user data
+            var updatedUser = _userRepository.GetUserById(userId);
+            if (updatedUser == null)
+            {
+                return StatusCode(500, new { success = false, message = "User updated, but could not reload data." });
+            }
+
+            // Generate new JWT token (with updated claims)
+            var newToken = _jwtService.GenerateToken(updatedUser);
+
+            // Refresh the authentication cookie
+            Response.Cookies.Append("token", newToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Set to true in production with HTTPS
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]))
+            });
+
+            // Return success response
+            return Ok(new
+            {
+                success = true,
+                message = "Profile updated successfully.",
+                token = newToken,
+                user = new
+                {
+                    id = updatedUser.UserId,
+                    updatedUser.username,
+                    updatedUser.email,
+                    updatedUser.phoneNumber,
+                    updatedUser.ProfilePicture
+                }
+            });
+        }
+
+
+        // UserController.cs
+
+        [HttpPut("update-profile-picture")]
+        [Authorize]
+        public IActionResult UpdateProfilePicture([FromBody] UpdateProfilePictureDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { success = false, message = "Invalid token." });
+            }
+
+            //if (string.IsNullOrWhiteSpace(dto.ProfilePictureUrl))
+            //{
+            //    return BadRequest(new { success = false, message = "Image URL is required." });
+            //}
+
+            // Validate URL format (optional)
+            //if (!Uri.IsWellFormedUriString(dto.ProfilePictureUrl, UriKind.Absolute))
+            //{
+            //    return BadRequest(new { success = false, message = "Invalid image URL." });
+            //}
+
+            // ✅ Allow null (for removal)
+            // Only validate format if URL is provided
+            if (!string.IsNullOrWhiteSpace(dto.ProfilePictureUrl))
+            {
+                if (!Uri.IsWellFormedUriString(dto.ProfilePictureUrl, UriKind.Absolute))
+                {
+                    return BadRequest(new { success = false, message = "Invalid image URL format." });
+                }
+            }
+
+            // Update only the profile picture
+            bool updated = _userRepository.UpdateProfilePicture(userId, dto.ProfilePictureUrl);
+            if (!updated)
+            {
+                return StatusCode(500, new { success = false, message = "Failed to update profile picture." });
+            }
+
+            // Reload updated user
+            var updatedUser = _userRepository.GetUserById(userId);
+            if (updatedUser == null)
+            {
+                return StatusCode(500, new { success = false, message = "User not found after update." });
+            }
+
+            // Generate new token with updated picture
+            var newToken = _jwtService.GenerateToken(updatedUser);
+
+            // Refresh auth cookie
+            Response.Cookies.Append("token", newToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]))
+            });
+
+            return Ok(new
+            {
+                success = true,
+                message = "Profile picture updated successfully.",
+                token = newToken,
+                user = new
+                {
+                    id = updatedUser.UserId,
+                    updatedUser.username,
+                    updatedUser.email,
+                    updatedUser.phoneNumber,
+                    updatedUser.ProfilePicture
+                }
+            });
+        }
+
     }
 }

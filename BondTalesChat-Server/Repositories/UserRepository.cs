@@ -67,7 +67,7 @@ namespace BondTalesChat_Server.Repositories
                                 username = reader.GetString(1),
                                 email = reader.GetString(2),
                                 password = reader.GetString(3),
-                                ProfilePicture = "No picture.",
+                                ProfilePicture = reader.GetString(4),
                                 CreatedAt = reader.GetDateTime(5),
                                 phoneNumber = reader.GetString(6)
                             };
@@ -76,6 +76,86 @@ namespace BondTalesChat_Server.Repositories
                 }
             }
             return null;
+        }
+
+        // Repositories/UserRepository.cs
+
+        public bool UpdateUser(int userId, string username, string email, string? phoneNumber, string passwordHash)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(@"
+            UPDATE Users 
+            SET username = @u, 
+                email = @e, 
+                phoneNumber = @p, 
+                userpassword = @h 
+            WHERE UserId = @id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@u", username);
+                    cmd.Parameters.AddWithValue("@e", email);
+                    cmd.Parameters.AddWithValue("@p", (object)phoneNumber ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@h", passwordHash);
+                    cmd.Parameters.AddWithValue("@id", userId);
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        // Optional: Add method to get user by ID
+        public UserModel? GetUserById(int userId)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(@"
+            SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt, phoneNumber 
+            FROM Users 
+            WHERE UserId = @id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", userId);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new UserModel
+                            {
+                                UserId = reader.GetInt32(0),
+                                username = reader.GetString(1),
+                                email = reader.GetString(2),
+                                password = reader.GetString(3),
+                                ProfilePicture = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                CreatedAt = reader.GetDateTime(5),
+                                phoneNumber = reader.IsDBNull(6) ? null : reader.GetString(6)
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // UserRepository.cs
+
+        public bool UpdateProfilePicture(int userId, string profilePictureUrl)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(
+                    "UPDATE Users SET ProfilePicture = @p WHERE UserId = @id", conn))
+                {
+                    // cmd.Parameters.AddWithValue("@p", profilePictureUrl);
+
+                    // ✅ Properly handle null
+                    cmd.Parameters.Add("@p", SqlDbType.NVarChar, 500).Value =
+                        (object)profilePictureUrl ?? DBNull.Value;
+                    cmd.Parameters.AddWithValue("@id", userId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
         }
     }
 }
