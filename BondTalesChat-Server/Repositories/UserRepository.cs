@@ -4,12 +4,6 @@ using Microsoft.Data.SqlClient;
 
 namespace BondTalesChat_Server.Repositories
 {
-    public interface IUserRepository 
-    {
-   
-
-    }
-
     public class UserRepository
     {
         private readonly string _connectionString;
@@ -44,11 +38,12 @@ namespace BondTalesChat_Server.Repositories
             {
                 conn.Open();
                 using (var insertCmd = new SqlCommand(
-                    "INSERT INTO Users (username, email, userpassword) VALUES (@u, @e, @h)", conn))
+                    "INSERT INTO Users (username, email, userpassword, phoneNumber) VALUES (@u, @e, @h, @p)", conn))
                 {
                     insertCmd.Parameters.AddWithValue("@u", user.username);
                     insertCmd.Parameters.AddWithValue("@e", user.email);
                     insertCmd.Parameters.AddWithValue("@h", user.password);
+                    insertCmd.Parameters.AddWithValue("@p", user.phoneNumber);
                     insertCmd.ExecuteNonQuery();
                 }
             }
@@ -56,18 +51,12 @@ namespace BondTalesChat_Server.Repositories
 
         public UserModel? GetUserByEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                return null;
-
-            Console.WriteLine($"Deii pota email {email}");
-
-            var trimmedEmail = email.Trim();
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                using (var cmd = new SqlCommand("SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt FROM Users Where email = @e", conn))
+                using (var cmd = new SqlCommand("SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt, phoneNumber FROM Users Where email = @e", conn))
                 {
-                    cmd.Parameters.AddWithValue("@e", email.ToString());
+                    cmd.Parameters.AddWithValue("@e", email);
                     using (var reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -79,7 +68,8 @@ namespace BondTalesChat_Server.Repositories
                                 email = reader.GetString(2),
                                 password = reader.GetString(3),
                                 ProfilePicture = "No picture.",
-                                CreatedAt = reader.GetDateTime(5)
+                                CreatedAt = reader.GetDateTime(5),
+                                phoneNumber = reader.GetString(6)
                             };
                         }
                     }

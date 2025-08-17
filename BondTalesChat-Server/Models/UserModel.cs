@@ -13,6 +13,7 @@ namespace BondTalesChat_Server.Models
         public string password { get; set; }
         public string ProfilePicture { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string phoneNumber { get; set; }
 
         //public ICollection<ConversationMemberModel> ConversationMembers { get; set; }
         //public ICollection<MessageModel> MessagesSent { get; set; }

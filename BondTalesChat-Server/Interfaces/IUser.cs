@@ -8,5 +8,6 @@
         string password { get; set; }
         string ProfilePicture { get; set; }
         DateTime CreatedAt { get; set; }
+        string phoneNumber { get; set; }
     }
 }

@@ -46,14 +46,13 @@ namespace BondTalesChat_Server.Controllers
             {
                 username = userDetails.Username!,
                 email = userDetails.Email!,
-                password = hash
+                password = hash,
+                phoneNumber = userDetails.PhoneNumber
             };
 
             _userRepository.CreateUser(user);
 
             var userData = _userRepository.GetUserByEmail(userDetails.Email);
-
-            Console.WriteLine($"{userData.UserId}, {userData.username}, {userData.email}");
 
             if (userData == null)
             {
@@ -79,7 +78,8 @@ namespace BondTalesChat_Server.Controllers
                 {
                     userData.UserId,
                     userData.username,
-                    userData.email
+                    userData.email,
+                    userData.phoneNumber
                 }
             });
         }
@@ -128,7 +128,8 @@ namespace BondTalesChat_Server.Controllers
                 {
                     user.UserId,
                     user.username,
-                    user.email
+                    user.email,
+                    user.phoneNumber
                 }
             });
         }
