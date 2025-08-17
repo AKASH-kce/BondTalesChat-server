@@ -32,7 +32,7 @@ namespace BondTalesChat_Server.Controllers
 
             if (string.IsNullOrWhiteSpace(userDetails.Username) || string.IsNullOrWhiteSpace(userDetails.Email) || string.IsNullOrWhiteSpace(userDetails.Password))
             {
-                return BadRequest(new { success = false, message = "username, email, and password cannot be empty" });
+                return BadRequest(new { success = false, message = "username, email, phoneNumber and password cannot be empty" });
             }
 
             if (_userRepository.UserExists(userDetails.Email))
