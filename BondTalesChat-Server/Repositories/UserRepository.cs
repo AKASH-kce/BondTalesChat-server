@@ -45,6 +45,10 @@ namespace BondTalesChat_Server.Repositories
                     insertCmd.Parameters.AddWithValue("@h", user.password);
                     insertCmd.Parameters.AddWithValue("@p", user.phoneNumber);
                     insertCmd.ExecuteNonQuery();
+                    // Get the auto-generated UserId
+                    //var newId = (int)(decimal)insertCmd.ExecuteScalar(); // SCOPE_IDENTITY() returns decimal
+                    //user.UserId = newId;
+                    //return user;
                 }
             }
         }
@@ -67,7 +71,7 @@ namespace BondTalesChat_Server.Repositories
                                 username = reader.GetString(1),
                                 email = reader.GetString(2),
                                 password = reader.GetString(3),
-                                ProfilePicture = reader.GetString(4),
+                                ProfilePicture = reader.IsDBNull(4) ? "No Picture" : reader.GetString(4),
                                 CreatedAt = reader.GetDateTime(5),
                                 phoneNumber = reader.GetString(6)
                             };

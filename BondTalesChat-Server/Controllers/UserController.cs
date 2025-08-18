@@ -59,7 +59,7 @@ namespace BondTalesChat_Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { success = false, message = "User data could not be retrieved after registration." });
             }
 
-            var token = _jwtService.GenerateToken(user);
+            var token = _jwtService.GenerateToken(userData);
 
             Response.Cookies.Append("token", token, new CookieOptions
             {
@@ -171,7 +171,7 @@ namespace BondTalesChat_Server.Controllers
                 message = "verified",
                 user = new
                 {
-                    id = int.Parse(userId),
+                    userId,
                     username,
                     email,
                     phoneNumber,
@@ -189,12 +189,14 @@ namespace BondTalesChat_Server.Controllers
         {
             // Extract user ID from JWT token
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine("This is the userId: koushiik " + userIdClaim);
             if (!int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized(new { success = false, message = "Invalid authentication token." });
             }
 
             // Fetch current user from DB
+            Console.WriteLine("This is the userID which I got" + userId);
             var user = _userRepository.GetUserById(userId);
             if (user == null)
             {
@@ -255,7 +257,7 @@ namespace BondTalesChat_Server.Controllers
                 token = newToken,
                 user = new
                 {
-                    id = updatedUser.UserId,
+                    updatedUser.UserId,
                     updatedUser.username,
                     updatedUser.email,
                     updatedUser.phoneNumber,
@@ -306,6 +308,7 @@ namespace BondTalesChat_Server.Controllers
             }
 
             // Reload updated user
+            Console.WriteLine("This is the userID which I got" + userId);
             var updatedUser = _userRepository.GetUserById(userId);
             if (updatedUser == null)
             {
