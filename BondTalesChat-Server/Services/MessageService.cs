@@ -1,40 +1,31 @@
-﻿using BondTalesChat_Server.Data;
-using BondTalesChat_Server.Hubs;
+﻿using BondTalesChat_Server.Hubs;
 using BondTalesChat_Server.models;
 using BondTalesChat_Server.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.OpenApi.Any;
 
 namespace BondTalesChat_Server.Services
 {
     public interface IMessageService
     {
         Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted);
-         Task<MessageModel[]> GetMessagesOfCurrentLoginUser(int loginuserId);
-
+        Task<List<MessageModel>> GetMessagesOfCurrentLoginUser(int loginuserId);
         Task<List<UserModel>> GetAllUsersChatList();
-
     }
 
     public class MessageService : IMessageService
     {
-        private readonly AppDbContext _db;
         private readonly IHubContext<ChatHub> _hub;
         private readonly string _connectionString;
 
-        public MessageService(AppDbContext context, IHubContext<ChatHub> hubContext,IConfiguration configuration)
+        public MessageService(IHubContext<ChatHub> hubContext, IConfiguration configuration)
         {
-            _db = context;
             _hub = hubContext;
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-
         public async Task<MessageModel> SaveAndBroadcastAsync(int ConversationId, int senderId, string Messagetext, string MediaUrl, byte MessageType, bool Edited, bool Deleted)
-
         {
             var msg = new MessageModel
             {
@@ -45,23 +36,78 @@ namespace BondTalesChat_Server.Services
                 MessageType = MessageType,
                 Edited = Edited,
                 Deleted = Deleted,
-                SentAt= DateTime.UtcNow
+                SentAt = DateTime.UtcNow
             };
 
-            _db.Messages.Add(msg);
-            await _db.SaveChangesAsync(); // EF automatically sets MessageId after this
+            await using (var con = new SqlConnection(_connectionString))
+            {
+                await con.OpenAsync();
 
+                var query = @"INSERT INTO Messages 
+                                (ConversationId, SenderId, MessageText, MediaUrl, MessageType, Edited, Deleted, SentAt)
+                              OUTPUT INSERTED.MessageId
+                              VALUES (@ConversationId, @SenderId, @MessageText, @MediaUrl, @MessageType, @Edited, @Deleted, @SentAt)";
+
+                await using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ConversationId", msg.ConversationId);
+                    cmd.Parameters.AddWithValue("@SenderId", msg.SenderId);
+                    cmd.Parameters.AddWithValue("@MessageText", (object?)msg.MessageText ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MediaUrl", (object?)msg.MediaUrl ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@MessageType", msg.MessageType);
+                    cmd.Parameters.AddWithValue("@Edited", msg.Edited);
+                    cmd.Parameters.AddWithValue("@Deleted", msg.Deleted);
+                    cmd.Parameters.AddWithValue("@SentAt", msg.SentAt);
+
+                    msg.MessageId = (int)await cmd.ExecuteScalarAsync();
+                }
+            }
+
+            // Broadcast via SignalR
             await _hub.Clients.All.SendAsync("ReceiveMessage", msg);
             return msg;
         }
 
-        public async Task<MessageModel[]> GetMessagesOfCurrentLoginUser(int loginuserId)
+        public async Task<List<MessageModel>> GetMessagesOfCurrentLoginUser(int loginuserId)
         {
-            return await _db.Messages.Where(m => m.SenderId == loginuserId).
-                OrderBy(m => m.SentAt)
-                .ToArrayAsync();
-        }
+            var messages = new List<MessageModel>();
 
+            await using (var con = new SqlConnection(_connectionString))
+            {
+                await con.OpenAsync();
+
+                var query = @"SELECT m.MessageId, m.ConversationId, m.SenderId, m.MessageText, 
+                                     m.MediaUrl, m.MessageType, m.SentAt, m.Edited, m.Deleted
+                              FROM Messages m
+                              INNER JOIN ConversationMembers cm ON m.ConversationId = cm.ConversationId
+                              WHERE cm.UserId = @UserId
+                              ORDER BY m.SentAt ASC";
+
+                await using (var cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@UserId", loginuserId);
+
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        messages.Add(new MessageModel
+                        {
+                            MessageId = reader.GetInt32(0),
+                            ConversationId = reader.GetInt32(1),
+                            SenderId = reader.GetInt32(2),
+                            MessageText = reader.IsDBNull(3) ? null : reader.GetString(3),
+                            MediaUrl = reader.IsDBNull(4) ? null : reader.GetString(4),
+                            MessageType = (byte)reader.GetByte(5),
+                            SentAt = reader.GetDateTime(6),
+                            Edited = reader.GetBoolean(7),
+                            Deleted = reader.GetBoolean(8)
+                        });
+                    }
+                }
+            }
+
+            return messages;
+        }
 
         public async Task<List<UserModel>> GetAllUsersChatList()
         {
@@ -73,7 +119,7 @@ namespace BondTalesChat_Server.Services
 
                 var query = "SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt, phoneNumber FROM Users";
 
-                using (var cmd = new SqlCommand(query, con))
+                await using (var cmd = new SqlCommand(query, con))
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
@@ -94,7 +140,5 @@ namespace BondTalesChat_Server.Services
 
             return users;
         }
-
-
     }
 }
