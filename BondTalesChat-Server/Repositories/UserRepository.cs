@@ -161,5 +161,21 @@ namespace BondTalesChat_Server.Repositories
                 }
             }
         }
+
+        public bool UpdatePassword(int userId, string password)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using(var cmd = new SqlCommand("UPDATE Users SET userpassword = @h WHERE UserId = @id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@h",password);
+                    cmd.Parameters.AddWithValue("@id", userId);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+
+            }
+
+        }
     }
 }

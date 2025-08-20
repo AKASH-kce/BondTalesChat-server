@@ -1,11 +1,12 @@
 using BondTalesChat_Server.Data;
 using BondTalesChat_Server.DatabaseInitializer;
 using BondTalesChat_Server.Hubs;
+using BondTalesChat_Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 // Need to look this package's usage. 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using BondTalesChat_Server.Services;
+using Newtonsoft.Json.Linq;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -36,13 +37,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnMessageReceived = context =>
             {
-                context.Token = context.Request.Cookies["token"];
+                // context.Token = context.Request.Cookies["token"];
+                var token = context.Request.Cookies["token"];
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
 
                 return Task.CompletedTask;
             }
         };
         
     });
+
+// Add Services to the container.
+
+builder.Services.AddSingleton<OtpService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
