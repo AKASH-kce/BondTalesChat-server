@@ -1,4 +1,5 @@
 ﻿using BondTalesChat_Server.models;
+using BondTalesChat_Server.Models;
 using BondTalesChat_Server.Services;
 using Microsoft.AspNetCore.SignalR;
 
@@ -25,6 +26,11 @@ namespace BondTalesChat_Server.Hubs
 
             // OR to send directly to caller:
             // await Clients.Caller.SendAsync("ReceiveAllMessages", messages);
+        }
+
+        public async Task<List<UserModel>> GetAllUsers()
+        {
+            return await _messageService.GetAllUsersChatList();
         }
     }
 }
