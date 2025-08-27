@@ -1,4 +1,5 @@
 ﻿using BondTalesChat_Server.models;
+using BondTalesChat_Server.Models.Dto;
 using Microsoft.Data.SqlClient;
 
 namespace BondTalesChat_Server.Services
@@ -9,6 +10,8 @@ namespace BondTalesChat_Server.Services
         Task<List<MessageModel>> GetMessagesByConversationAsync(int conversationId);
 
         Task<int?> GetTopFriendIdAsync(int userId);
+
+        Task<List<ConversationWithLastMessageDto>> GetUserConversationsWithLastMessageAsync(int userId);
     }
 
     public class ConversationService : IConversationService
@@ -147,6 +150,72 @@ namespace BondTalesChat_Server.Services
                 }
             }
         }
+
+        public async Task<List<ConversationWithLastMessageDto>> GetUserConversationsWithLastMessageAsync(int userId)
+        {
+            var conversations = new List<ConversationWithLastMessageDto>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+
+                string query = @"
+            SELECT 
+                c.ConversationId,
+                c.IsGroup,
+                c.Title,
+                u.UserId,
+                u.username,
+                u.ProfilePicture,
+                m.MessageText,
+                m.SentAt,
+                m.SenderId,
+                (SELECT COUNT(*) FROM MessageDeliveries md 
+                 WHERE md.MessageId = m.MessageId AND md.UserId = @userId AND md.Status = 0) as UnreadCount
+            FROM Conversations c
+            INNER JOIN ConversationMembers cm ON c.ConversationId = cm.ConversationId
+            LEFT JOIN (
+                SELECT ConversationId, MAX(SentAt) as LatestSentAt
+                FROM Messages
+                GROUP BY ConversationId
+            ) lm ON c.ConversationId = lm.ConversationId
+            LEFT JOIN Messages m ON lm.ConversationId = m.ConversationId AND lm.LatestSentAt = m.SentAt
+            LEFT JOIN ConversationMembers cm2 ON c.ConversationId = cm2.ConversationId AND cm2.UserId != @userId
+            LEFT JOIN Users u ON cm2.UserId = u.UserId
+            WHERE cm.UserId = @userId
+            ORDER BY m.SentAt DESC";
+
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var conversation = new ConversationWithLastMessageDto
+                            {
+                                ConversationId = reader.GetInt32(0),
+                                IsGroup = reader.GetBoolean(1),
+                                Title = reader.IsDBNull(2) ? null : reader.GetString(2),
+                                OtherUserId = reader.IsDBNull(3) ? (int?)null : reader.GetInt32(3),
+                                OtherUserName = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                OtherUserProfilePicture = reader.IsDBNull(5) ? null : reader.GetString(5),
+                                LastMessage = reader.IsDBNull(6) ? null : reader.GetString(6),
+                                LastMessageTime = reader.IsDBNull(7) ? DateTime.MinValue : reader.GetDateTime(7),
+                                LastMessageSenderId = reader.IsDBNull(8) ? (int?)null : reader.GetInt32(8),
+                                UnreadCount = reader.IsDBNull(9) ? 0 : reader.GetInt32(9)
+                            };
+
+                            conversations.Add(conversation);
+                        }
+                    }
+                }
+            }
+
+            return conversations;
+        }
+
 
     }
 

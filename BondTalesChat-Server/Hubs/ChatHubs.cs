@@ -1,5 +1,6 @@
 ﻿using BondTalesChat_Server.models;
 using BondTalesChat_Server.Models;
+using BondTalesChat_Server.Models.Dto;
 using BondTalesChat_Server.Services;
 using Microsoft.AspNetCore.SignalR;
 
@@ -66,6 +67,19 @@ namespace BondTalesChat_Server.Hubs
         public async Task<int?> getFrndTop1Id(int userId)
         {
             return await _conversationService.GetTopFriendIdAsync(userId);
+        }
+
+        public async Task<List<ConversationWithLastMessageDto>> GetUserConversations(int userId)
+        {
+            try
+            {
+                return await _conversationService.GetUserConversationsWithLastMessageAsync(userId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Hub Error] GetUserConversations failed: {ex}");
+                throw;
+            }
         }
 
     }
