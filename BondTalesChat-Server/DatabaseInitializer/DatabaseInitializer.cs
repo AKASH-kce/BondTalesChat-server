@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Npgsql;
 
 namespace BondTalesChat_Server.DatabaseInitializer
 {
@@ -6,7 +6,7 @@ namespace BondTalesChat_Server.DatabaseInitializer
     {
         public static void Initializer(string connectionString, string sqlFolderPath)
         {
-            using var connection = new SqlConnection(connectionString);
+            using var connection = new NpgsqlConnection(connectionString);
             connection.Open();
 
             foreach (var file in Directory.GetFiles(sqlFolderPath, "*.sql"))
@@ -14,13 +14,13 @@ namespace BondTalesChat_Server.DatabaseInitializer
                 Console.WriteLine($"Executing script: {Path.GetFileName(file)}");
                 var script = File.ReadAllText(file);
 
-                using var command = new SqlCommand(script, connection);
+                using var command = new NpgsqlCommand(script, connection);
 
                 try
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (SqlException ex)
+                catch (PostgresException ex)
                 {
                     // Log but don't stop
                     Console.WriteLine($"⚠️ Skipped (already exists or harmless): {ex.Message}");

@@ -2,7 +2,7 @@
 using BondTalesChat_Server.models;
 using BondTalesChat_Server.Models;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.Extensions.Configuration;
 
 namespace BondTalesChat_Server.Services
@@ -39,16 +39,16 @@ namespace BondTalesChat_Server.Services
                 SentAt = DateTime.UtcNow
             };
 
-            await using (var con = new SqlConnection(_connectionString))
+            await using (var con = new NpgsqlConnection(_connectionString))
             {
                 await con.OpenAsync();
 
                 var query = @"INSERT INTO Messages 
                                 (ConversationId, SenderId, MessageText, MediaUrl, MessageType, Edited, Deleted, SentAt)
-                              OUTPUT INSERTED.MessageId
-                              VALUES (@ConversationId, @SenderId, @MessageText, @MediaUrl, @MessageType, @Edited, @Deleted, @SentAt)";
+                              VALUES (@ConversationId, @SenderId, @MessageText, @MediaUrl, @MessageType, @Edited, @Deleted, @SentAt)
+                              RETURNING MessageId";
 
-                await using (var cmd = new SqlCommand(query, con))
+                await using (var cmd = new NpgsqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@ConversationId", msg.ConversationId);
                     cmd.Parameters.AddWithValue("@SenderId", msg.SenderId);
@@ -72,7 +72,7 @@ namespace BondTalesChat_Server.Services
         {
             var messages = new List<MessageModel>();
 
-            await using (var con = new SqlConnection(_connectionString))
+            await using (var con = new NpgsqlConnection(_connectionString))
             {
                 await con.OpenAsync();
 
@@ -83,7 +83,7 @@ namespace BondTalesChat_Server.Services
                               WHERE cm.UserId = @UserId
                               ORDER BY m.SentAt ASC";
 
-                await using (var cmd = new SqlCommand(query, con))
+                await using (var cmd = new NpgsqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@UserId", loginuserId);
 
@@ -113,13 +113,13 @@ namespace BondTalesChat_Server.Services
         {
             var users = new List<UserModel>();
 
-            await using (var con = new SqlConnection(_connectionString))
+            await using (var con = new NpgsqlConnection(_connectionString))
             {
                 await con.OpenAsync();
 
                 var query = "SELECT UserId, username, email, userpassword, ProfilePicture, CreatedAt, phoneNumber FROM Users";
 
-                await using (var cmd = new SqlCommand(query, con))
+                await using (var cmd = new NpgsqlCommand(query, con))
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())

@@ -1,6 +1,5 @@
 ﻿using BondTalesChat_Server.models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace BondTalesChat_Server.Data
 {
@@ -15,7 +14,7 @@ namespace BondTalesChat_Server.Data
             modelBuilder.Entity<MessageModel>(entity =>
             {
                 entity.Property(e => e.MessageType).HasDefaultValue((byte)0);
-                entity.Property(e => e.SentAt).HasDefaultValueSql("SYSUTCDATETIME()");
+                entity.Property(e => e.SentAt).HasDefaultValueSql("NOW()");
                 entity.Property(e => e.Edited).HasDefaultValue(false);
                 entity.Property(e => e.Deleted).HasDefaultValue(false);
             });

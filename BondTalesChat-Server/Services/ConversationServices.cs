@@ -1,6 +1,6 @@
 ﻿using BondTalesChat_Server.models;
 using BondTalesChat_Server.Models.Dto;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 
 namespace BondTalesChat_Server.Services
 {
@@ -25,7 +25,7 @@ namespace BondTalesChat_Server.Services
 
         public async Task<int> GetOrCreateConversationAsync(int currentUserId, int otherUserId)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (NpgsqlConnection conn = new NpgsqlConnection(_connectionString))
             {
                 await conn.OpenAsync();
 
@@ -38,7 +38,7 @@ namespace BondTalesChat_Server.Services
                   AND cm1.UserId = @currentUserId
                   AND cm2.UserId = @otherUserId";
 
-                using (SqlCommand cmd = new SqlCommand(checkQuery, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(checkQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@currentUserId", currentUserId);
                     cmd.Parameters.AddWithValue("@otherUserId", otherUserId);
@@ -52,10 +52,10 @@ namespace BondTalesChat_Server.Services
                 int newConversationId;
                 string insertConv = @"
                 INSERT INTO Conversations (IsGroup, CreatedBy, CreatedAt)
-                OUTPUT INSERTED.ConversationId
-                VALUES (0, @currentUserId, SYSUTCDATETIME())";
+                VALUES (0, @currentUserId, NOW())
+                RETURNING ConversationId";
 
-                using (SqlCommand cmd = new SqlCommand(insertConv, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(insertConv, conn))
                 {
                     cmd.Parameters.AddWithValue("@currentUserId", currentUserId);
                     newConversationId = (int)await cmd.ExecuteScalarAsync();
@@ -66,7 +66,7 @@ namespace BondTalesChat_Server.Services
                 INSERT INTO ConversationMembers (ConversationId, UserId)
                 VALUES (@convId, @userId1), (@convId, @userId2)";
 
-                using (SqlCommand cmd = new SqlCommand(insertMembers, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(insertMembers, conn))
                 {
                     cmd.Parameters.AddWithValue("@convId", newConversationId);
                     cmd.Parameters.AddWithValue("@userId1", currentUserId);
@@ -82,7 +82,7 @@ namespace BondTalesChat_Server.Services
         {
             var messages = new List<MessageModel>();
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (NpgsqlConnection conn = new NpgsqlConnection(_connectionString))
             {
                 await conn.OpenAsync();
 
@@ -92,7 +92,7 @@ namespace BondTalesChat_Server.Services
                 WHERE ConversationId = @conversationId
                 ORDER BY SentAt ASC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@conversationId", conversationId);
 
@@ -123,12 +123,12 @@ namespace BondTalesChat_Server.Services
 
         public async Task<int?> GetTopFriendIdAsync(int userId)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (NpgsqlConnection conn = new NpgsqlConnection(_connectionString))
             {
                 await conn.OpenAsync();
 
                 string query = @"
-            SELECT TOP 1 
+            SELECT 
                    CASE 
                         WHEN cm.UserId = @userId THEN cm2.UserId 
                         ELSE cm.UserId 
@@ -139,9 +139,10 @@ namespace BondTalesChat_Server.Services
             INNER JOIN Messages m ON c.ConversationId = m.ConversationId
             WHERE c.IsGroup = 0
               AND (cm.UserId = @userId OR cm2.UserId = @userId)
-            ORDER BY m.SentAt DESC;";
+            ORDER BY m.SentAt DESC
+            LIMIT 1;";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 
@@ -155,7 +156,7 @@ namespace BondTalesChat_Server.Services
         {
             var conversations = new List<ConversationWithLastMessageDto>();
 
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (NpgsqlConnection conn = new NpgsqlConnection(_connectionString))
             {
                 await conn.OpenAsync();
 
@@ -185,7 +186,7 @@ namespace BondTalesChat_Server.Services
             WHERE cm.UserId = @userId
             ORDER BY m.SentAt DESC";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (NpgsqlCommand cmd = new NpgsqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@userId", userId);
 

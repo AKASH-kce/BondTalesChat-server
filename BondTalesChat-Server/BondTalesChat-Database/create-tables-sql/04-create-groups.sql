@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS Groups (
+    GroupId SERIAL PRIMARY KEY,
+    GroupName VARCHAR(200) NOT NULL,
+    CreatedBy INT NOT NULL,
+    CreatedAt TIMESTAMP DEFAULT NOW()
+);
