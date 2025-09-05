@@ -14,10 +14,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder => builder.WithOrigins("http://localhost:4200")
-                          .AllowAnyMethod()
-                          .AllowAnyHeader()
-                          .AllowCredentials());
+        policy => policy.WithOrigins(
+                "http://localhost:4200",
+                "https://localhost:4200",
+                "https://your-frontend-domain.onrender.com", // Replace with your actual frontend domain
+                "https://your-frontend-domain.vercel.app",   // Replace with your actual frontend domain
+                "https://your-frontend-domain.netlify.app"   // Replace with your actual frontend domain
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
 
 });
 

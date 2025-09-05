@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: bondtaleschat-backend
+    env: dotnet
+    plan: free
+    buildCommand: dotnet restore && dotnet publish -c Release -o out
+    startCommand: dotnet out/BondTalesChat-Server.dll
+    healthCheckPath: /swagger
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:$PORT
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: bondtaleschat-db
+          property: connectionString
+      - key: Jwt__Key
+        sync: false
+      - key: Jwt__Issuer
+        value: BondTalesChat
+      - key: Jwt__Audience
+        value: BondTalesChat
+      - key: Jwt__ExpiresInMinutes
+        value: 60
+      - key: Smtp__FromEmail
+        value: koushiik2003@gmail.com
+      - key: Smtp__FromName
+        value: BondTales Chat Application Support
+      - key: Smtp__Host
+        value: smtp.gmail.com
+      - key: Smtp__Port
+        value: 587
+      - key: Smtp__EnableSsl
+        value: true
+      - key: Smtp__Username
+        sync: false
+      - key: Smtp__Password
+        sync: false
+
+databases:
+  - name: bondtaleschat-db
+    plan: free
+    databaseName: bondtaleschat
+    user: bondtaleschat_user
