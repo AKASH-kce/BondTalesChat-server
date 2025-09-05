@@ -6,8 +6,16 @@ namespace BondTalesChat_Server.DatabaseInitializer
     {
         public static void Initializer(string connectionString, string sqlFolderPath)
         {
-            using var connection = new NpgsqlConnection(connectionString);
-            connection.Open();
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                Console.WriteLine("⚠️ Connection string is empty, skipping database initialization");
+                return;
+            }
+
+            try
+            {
+                using var connection = new NpgsqlConnection(connectionString);
+                connection.Open();
 
             foreach (var file in Directory.GetFiles(sqlFolderPath, "*.sql"))
             {
@@ -27,7 +35,13 @@ namespace BondTalesChat_Server.DatabaseInitializer
                 }
             }
 
-            Console.WriteLine("✅ Database initialization complete");
+                Console.WriteLine("✅ Database initialization complete");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Database initialization failed: {ex.Message}");
+                Console.WriteLine("⚠️ Continuing without database initialization...");
+            }
         }
     }
 }

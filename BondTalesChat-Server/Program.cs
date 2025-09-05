@@ -80,13 +80,21 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 //Configure the SQL scripts folder path
-var projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
-var sqlFolderPath = Path.Combine(projectRoot, "BondTalesChat-Database", "create-tables-sql");
+var sqlFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BondTalesChat-Database", "create-tables-sql");
 
-Console.WriteLine(sqlFolderPath);
+Console.WriteLine($"SQL Folder Path: {sqlFolderPath}");
+Console.WriteLine($"Connection String: {builder.Configuration.GetConnectionString("DefaultConnection")}");
 
-//run a method to execute the SQL files and create table during initialization
-DatabaseInitializer.Initializer(builder.Configuration.GetConnectionString("DefaultConnection"), sqlFolderPath);
+// Only run database initialization if connection string is provided
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrEmpty(connectionString))
+{
+    DatabaseInitializer.Initializer(connectionString, sqlFolderPath);
+}
+else
+{
+    Console.WriteLine("⚠️ No connection string provided, skipping database initialization");
+}
 
 
 // Configure the HTTP request pipeline.
