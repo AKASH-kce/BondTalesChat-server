@@ -426,8 +426,8 @@ CREATE TABLE IF NOT EXISTS UserConnections(
 
 ## **Notes**
 
-* 1:1 conversations → `IsGroup = 0`, exactly 2 members.
-* Group conversations → `IsGroup = 1`, multiple members.
+* 1:1 conversations → `IsGroup = FALSE`, exactly 2 members.
+* Group conversations → `IsGroup = TRUE`, multiple members.
 * Delivery status → 0=Sent, 1=Delivered, 2=Read.
 * Messages are **single source** for all conversations.
 * Receiver(s) are **derived from `ConversationMembers`** excluding sender.

@@ -34,7 +34,7 @@ namespace BondTalesChat_Server.Services
                 FROM Conversations c
                 INNER JOIN ConversationMembers cm1 ON c.ConversationId = cm1.ConversationId
                 INNER JOIN ConversationMembers cm2 ON c.ConversationId = cm2.ConversationId
-                WHERE c.IsGroup = 0
+                WHERE c.IsGroup = FALSE
                   AND cm1.UserId = @currentUserId
                   AND cm2.UserId = @otherUserId";
 
@@ -52,7 +52,7 @@ namespace BondTalesChat_Server.Services
                 int newConversationId;
                 string insertConv = @"
                 INSERT INTO Conversations (IsGroup, CreatedBy, CreatedAt)
-                VALUES (0, @currentUserId, NOW())
+                VALUES (FALSE, @currentUserId, NOW())
                 RETURNING ConversationId";
 
                 using (NpgsqlCommand cmd = new NpgsqlCommand(insertConv, conn))
@@ -137,7 +137,7 @@ namespace BondTalesChat_Server.Services
             INNER JOIN ConversationMembers cm ON c.ConversationId = cm.ConversationId
             INNER JOIN ConversationMembers cm2 ON c.ConversationId = cm2.ConversationId
             INNER JOIN Messages m ON c.ConversationId = m.ConversationId
-            WHERE c.IsGroup = 0
+            WHERE c.IsGroup = FALSE
               AND (cm.UserId = @userId OR cm2.UserId = @userId)
             ORDER BY m.SentAt DESC
             LIMIT 1;";
