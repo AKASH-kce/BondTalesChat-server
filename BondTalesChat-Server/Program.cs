@@ -28,7 +28,7 @@ builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -36,37 +36,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
-
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
-                var path = context.HttpContext.Request.Path;
+                // context.Token = context.Request.Cookies["token"];
+                var token = context.Request.Cookies["token"];
 
-                // ✅ Case 1: SignalR CallHub uses access_token
-                var accessToken = context.Request.Query["access_token"];
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/hubs/call"))
+                if (!string.IsNullOrEmpty(token))
                 {
-                    context.Token = accessToken;
-                }
-
-                // ✅ Case 2: Fallback to cookie for normal APIs/ChatHub
-                if (string.IsNullOrEmpty(context.Token))
-                {
-                    var cookieToken = context.Request.Cookies["token"];
-                    if (!string.IsNullOrEmpty(cookieToken))
-                    {
-                        context.Token = cookieToken;
-                    }
+                    context.Token = token;
                 }
 
                 return Task.CompletedTask;
             }
         };
+
     });
 
 // Services
