@@ -17,14 +17,11 @@ builder.Services.AddCors(options =>
         policy => policy.WithOrigins(
                 "http://localhost:4200",
                 "https://localhost:4200",
-                "https://your-frontend-domain.onrender.com", // Replace with your actual frontend domain
-                "https://your-frontend-domain.vercel.app",   // Replace with your actual frontend domain
-                "https://your-frontend-domain.netlify.app"   // Replace with your actual frontend domain
+                "https://akash-cc.onrender.com"  // deployed frontend
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
-
 });
 
 builder.Services.AddScoped<JwtService>();
