@@ -7,10 +7,10 @@ EXPOSE 8081
 # Use the official .NET 8 SDK for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["BondTalesChat-Server.csproj", "."]
-RUN dotnet restore "./BondTalesChat-Server.csproj"
+COPY ["BondTalesChat-Server/BondTalesChat-Server.csproj", "BondTalesChat-Server/"]
+RUN dotnet restore "BondTalesChat-Server/BondTalesChat-Server.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/BondTalesChat-Server"
 RUN dotnet build "BondTalesChat-Server.csproj" -c Release -o /app/build
 
 FROM build AS publish
