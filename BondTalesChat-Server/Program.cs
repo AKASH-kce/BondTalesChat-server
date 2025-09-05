@@ -16,6 +16,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
         policy => policy.WithOrigins(
                 "http://localhost:4200",
+                "http://localhost:5257",
                 "https://localhost:4200",
                 "https://akash-cc.onrender.com"  // deployed frontend
             )

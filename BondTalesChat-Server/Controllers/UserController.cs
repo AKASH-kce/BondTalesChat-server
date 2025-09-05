@@ -61,7 +61,7 @@ namespace BondTalesChat_Server.Controllers
             {
                 HttpOnly = true,
                 Secure = false, // ← SET THIS TO FALSE FOR LOCALHOST
-                SameSite = SameSiteMode.Lax,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiresInMinutes"]))
             });
 
